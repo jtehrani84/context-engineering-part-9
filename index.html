@@ -211,6 +211,29 @@
     </div>
   </section>
 
+  <!-- 7c. INTERACTIVE: THE CROSS-VENDOR LOOP (case study) -->
+  <section class="py-16 md:py-24 reveal">
+    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Interactive · seen in practice</div>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Cross-Vendor Loop, Run for Real</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg mb-8">
+      <p>I put that idea through a real task, not a toy one: design the enrollment CRM schema for a small private school that wants to grow. It's exactly the kind of work I author myself, which is what makes it a fair test... does a second opinion from a different lab actually change the answer? Walk the loop, one step at a time.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-2 gap-2" id="loopRows">
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="task">1 · task</div>
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="route">2 · router</div>
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="dispatch">3 · dispatch</div>
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="diverge">4 · divergence</div>
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="adjudicate">5 · adjudicate</div>
+        <div class="cand p-3 text-center font-mono text-xs text-cyan" data-ls="reconcile">6 · reconcile</div>
+      </div>
+      <div class="glass rounded-2xl p-6 min-h-[220px]" id="loopDetail">
+        <div class="text-slate-500 text-sm font-mono">Select a step in the loop.</div>
+      </div>
+    </div>
+    <p class="mt-6 max-w-3xl text-slate-500 text-sm">Two other labs' models, one design task, and the return was the disagreement. The catch that mattered was a governance one a copy of me would likely have shipped. That's the whole case for routing your own work past a different brain.</p>
+  </section>
+
   <!-- 8. WHERE THIS IS THIN -->
   <section class="py-16 md:py-24 reveal">
     <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Where This Is Thin</h2>
@@ -303,6 +326,23 @@
     };
     setTimeout(step, 200);
   });
+
+  // ---- micro-demo: the cross-vendor loop (case study, abstracted) ----
+  const LOOP = {
+    task:       { h: 'A design task, in plain conversation', d: 'Design the enrollment CRM schema for a small private school that wants to grow. No form to fill in, no model picker... just the task, the way real work arrives.' },
+    route:      { h: 'The router reads the task, not a menu', d: 'It\'s a design review of my own work, so it wants a second opinion from a different lab, not another copy of me. And it checks the data class first: this is a public, non-sensitive design, so an outside model is allowed. Student or customer data would have stayed home, never dispatched.' },
+    dispatch:   { h: 'Two other frontier labs, governed', d: 'The task goes to two models from different labs. Every answer they send back runs through the same guards as anything else, checked for leaks and for voice, before I read a word of it.' },
+    diverge:    { h: 'They disagreed in three places', d: 'How to model the enrollment journey. Which marketing tool to reach for. And whether to store each family\'s religion, employer, and income to target them. One lab took that data as a growth lever. The other refused it as a privacy-and-fairness landmine. A copy of me could have shipped either side with equal confidence.' },
+    adjudicate: { h: 'The docs break the factual ties', d: 'Where the split was about fact and not judgment, the platform documentation settles it. The native data model turned out to be neither lab\'s first guess, which is a fair reminder that a confident model is still working from memory.' },
+    reconcile:  { h: 'I keep the disagreement', d: 'I synthesize the final design, and the part I hold onto is the catch, especially the governance one. That single catch, surfaced only because a different lab looked, is the entire return on the second opinion.' },
+  };
+  const loopDetail = document.getElementById('loopDetail');
+  document.querySelectorAll('#loopRows .cand').forEach(chip => chip.addEventListener('click', () => {
+    document.querySelectorAll('#loopRows .cand').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+    const s = LOOP[chip.dataset.ls];
+    loopDetail.innerHTML = `<div class="text-slate-200 text-sm font-medium mb-2">${s.h}</div><div class="text-slate-400 text-sm leading-relaxed">${s.d}</div>`;
+  }));
 </script>
 </body>
 </html>
