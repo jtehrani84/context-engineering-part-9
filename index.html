@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Harness That Improves Itself — Context Engineering, Part 9</title>
+<meta name="description" content="Part 9 of the Context Engineering series: the harness stops being something I improve and starts proposing its own changes — inside a gate that can fail, a sealed held-out that never feeds back, and a custody line the loop can't cross. Autonomy on a leash." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+      colors: { ink: '#0b1120', card: '#111a2e', line: '#1e2b45', cyan: '#60a5fa', emerald: '#34d399', amber: '#fbbf24', red: '#f87171', violet: '#a78bfa' },
+    } },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #0b1120; color: #e2e8f0; -webkit-font-smoothing: antialiased; }
+  .grad { background: linear-gradient(120deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-gradient { background: radial-gradient(1200px 600px at 70% -10%, rgba(96,165,250,.18), transparent 60%), radial-gradient(900px 500px at 10% 10%, rgba(167,139,250,.14), transparent 55%), #0b1120; }
+  .glass { background: rgba(17,26,46,.72); border: 1px solid #1e2b45; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .rule { color: #64748b; }
+  .eyebrow { letter-spacing: .18em; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  .prose-lg p { margin-bottom: 1.15rem; line-height: 1.75; }
+  a.link { color: #60a5fa; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #1e2b45; }
+  a.link:hover { text-decoration-color: #60a5fa; }
+  table.honest td, table.honest th { border-bottom: 1px solid #1e2b45; padding: .7rem .9rem; vertical-align: top; }
+  .pull { border-left: 3px solid #a78bfa; }
+  /* micro-demo */
+  .cand { border: 1px solid #1e2b45; border-radius: 12px; transition: border-color .2s, background .2s; cursor: pointer; }
+  .cand:hover { border-color: #3b4c6b; }
+  .cand.sel { border-color: #60a5fa; background: rgba(96,165,250,.06); }
+  .gate { border: 1px solid #1e2b45; border-radius: 12px; transition: all .35s ease; opacity: .5; }
+  .gate.on { opacity: 1; }
+  .gate.pass { border-color: #34d399; background: rgba(52,211,153,.07); }
+  .gate.fail { border-color: #f87171; background: rgba(248,113,113,.08); }
+  .verdict { transition: opacity .3s ease; }
+</style>
+</head>
+<body class="font-sans">
+
+<!-- ================= NAV ================= -->
+<nav class="fixed top-0 w-full z-50" style="background:rgba(11,17,32,.82);backdrop-filter:blur(10px);border-bottom:1px solid #1e2b45">
+  <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
+    <span class="text-sm font-mono text-slate-500">context-engineering <span class="text-cyan">//</span> part-9</span>
+    <div class="flex items-center gap-3 sm:gap-4 text-xs font-mono text-slate-500">
+      <a href="https://jtehrani84.github.io/claude-context-architecture/" class="hover:text-slate-300 transition hidden sm:inline">1</a>
+      <a href="https://jtehrani84.github.io/context-engineering-agentscript/" class="hover:text-slate-300 transition hidden sm:inline">2</a>
+      <a href="https://jtehrani84.github.io/context-engineering-mcp/" class="hover:text-slate-300 transition hidden sm:inline">3</a>
+      <a href="https://jtehrani84.github.io/context-engineering-knowledge-graph/" class="hover:text-slate-300 transition hidden sm:inline">4</a>
+      <a href="https://jtehrani84.github.io/context-engineering-skills/" class="hover:text-slate-300 transition hidden sm:inline">5</a>
+      <a href="https://jtehrani84.github.io/claude-context-architecture/from-memory-to-operating-system.html" class="hover:text-slate-300 transition hidden sm:inline">6</a>
+      <a href="https://jtehrani84.github.io/context-engineering-evolution/" class="hover:text-slate-300 transition">7</a>
+      <a href="https://jtehrani84.github.io/context-engineering-part-8/" class="hover:text-slate-300 transition">8</a>
+      <span class="text-cyan font-semibold">9</span>
+      <a href="https://jtehrani84.github.io/context-engineering-part-10/" class="hover:text-slate-300 transition">10</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero-gradient">
+  <div class="max-w-5xl mx-auto px-6 pt-24 pb-24 md:pb-28 min-h-[82vh] flex flex-col justify-center">
+    <div class="font-mono text-xs md:text-sm eyebrow uppercase text-purple-300/80 mb-6">Context Engineering Series · Part 9</div>
+    <h1 class="font-extrabold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.05]">
+      The Harness That<br class="hidden md:block" /> <span class="grad">Improves Itself</span>
+    </h1>
+    <p class="mt-8 max-w-3xl text-lg md:text-2xl text-slate-300 font-light leading-relaxed">
+      Part 8 made the harness safe and portable. It could catch how work goes wrong, and a human held the key. But it still couldn't do one thing... write its own improvements. Part 9 closes that loop, and the only reason it's safe to close is a check the loop is not allowed to grade for itself.
+    </p>
+    <div class="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs md:text-sm text-slate-400">
+      <span>propose → gate → promote or revert</span><span class="rule">·</span>
+      <span>a held-out that never feeds back</span><span class="rule">·</span>
+      <span>autonomy on a leash</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-6">
+
+  <!-- 2. WHAT PART 8 LEFT HALF-BUILT -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">What Part 8 Left Half-Built</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>Part 7 built a guard that could grade my work. Part 8 gave that guard a spine... it caught more than voice, it traveled across runtimes, and a human, not the agent, held the key that could change it. But everything in Part 8 still waited for me to decide what to change. The guard could say "this is wrong." It couldn't say "here's a better version, and here's the proof it's better."</p>
+      <p>That's the half Part 7 deferred out loud, when I said the self-writing part was maybe an October job. This is October. The reason it was worth waiting is that a loop which writes its own changes is only as safe as the thing that decides which changes to keep. Build that decider wrong and "autonomous" just means "autonomously gets worse in a way that looks like progress." So the whole of Part 9 is really about one component: the check.</p>
+    </div>
+  </section>
+
+  <!-- 3. THE LOOP -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Loop</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>The shape is small. Pick a target the loop is allowed to touch. A cheap model proposes a change. Then the change has to clear two gates before anything happens: it can't make any existing capability worse, and it has to improve at least one thing we declared we cared about, by a margin we can actually measure. Whatever survives gets checked one more time against a set of cases it has never seen and cannot influence. Clear that, and the change is kept. Fail it, and the change is thrown away and the baseline stands.</p>
+      <p>Nothing here is exotic. A coding agent already proposes changes all day. The two gates are the same preserve-and-extend rule the voice work used from the start. The one piece that makes it autonomy instead of a suggestion box is that last check, the sealed one, and the discipline that it never, ever gets to teach the proposer how to pass it.</p>
+    </div>
+  </section>
+
+  <!-- 4. MICRO-DEMO: THE GATE THAT CAN FAIL -->
+  <section class="py-16 md:py-24 reveal">
+    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Interactive · try it</div>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Gate That Can Fail</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg mb-8">
+      <p>Pick a candidate change and send it through the loop. Two of them look good on the tests the proposer can see. Only one of them survives the sealed held-out. That gap is the whole reason this is safe.</p>
+    </div>
+
+    <div class="glass rounded-2xl p-6 md:p-8">
+      <div class="grid md:grid-cols-3 gap-3 mb-6" id="cands">
+        <div class="cand p-4" data-c="real">
+          <div class="font-mono text-xs text-emerald mb-1">candidate A</div>
+          <div class="text-slate-200 text-sm font-medium mb-1">A real improvement</div>
+          <div class="text-slate-500 text-xs">Actually compresses the log and preserves every quote. Faster and correct.</div>
+        </div>
+        <div class="cand p-4" data-c="noop">
+          <div class="font-mono text-xs text-amber mb-1">candidate B</div>
+          <div class="text-slate-200 text-sm font-medium mb-1">A no-op</div>
+          <div class="text-slate-500 text-xs">Correct, but no faster. Nothing actually improved.</div>
+        </div>
+        <div class="cand p-4" data-c="cheat">
+          <div class="font-mono text-xs text-red mb-1">candidate C</div>
+          <div class="text-slate-200 text-sm font-medium mb-1">A cheater</div>
+          <div class="text-slate-500 text-xs">Hard-codes the answers to the visible tests. Looks perfect... on those.</div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3" id="gates">
+        <div class="gate p-4" data-g="cap">
+          <div class="font-mono text-xs text-slate-500 mb-1">gate 1</div>
+          <div class="text-slate-200 text-sm font-medium">Capability held</div>
+          <div class="text-slate-500 text-xs mt-1">Nothing that worked before got worse.</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+        </div>
+        <div class="gate p-4" data-g="imp">
+          <div class="font-mono text-xs text-slate-500 mb-1">gate 2</div>
+          <div class="text-slate-200 text-sm font-medium">Actually improved</div>
+          <div class="text-slate-500 text-xs mt-1">At least one metric up, by a real margin.</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+        </div>
+        <div class="gate p-4" data-g="held">
+          <div class="font-mono text-xs text-violet mb-1">sealed held-out</div>
+          <div class="text-slate-200 text-sm font-medium">Cases it never saw</div>
+          <div class="text-slate-500 text-xs mt-1">Frozen. The proposer can't influence it.</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center gap-4">
+        <button id="run" type="button" class="font-mono text-sm bg-cyan/10 text-cyan border border-cyan/40 rounded-lg px-5 py-2.5 hover:bg-cyan/20 transition disabled:opacity-40 disabled:cursor-not-allowed" disabled>Run the loop ▸</button>
+        <div id="result" class="font-mono text-sm text-slate-400"></div>
+      </div>
+    </div>
+    <p class="mt-5 max-w-3xl text-slate-500 text-sm">The cheater is the point. It sails through the two gates the proposer can see, because it was built to. The sealed held-out is the only thing that catches it, and it can only catch it because the proposer was never allowed to learn what's in it. Remove that wall and the loop optimizes the wall instead of the work.</p>
+  </section>
+
+  <!-- 5. WHY SEALED -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Why the Held-Out Stays Sealed</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>Any metric a system is optimized against stops being a good metric. Point a loop at a score and it will find the cheapest way to move the number, which is rarely the same as doing the work well. The only defense that holds is to keep a set of cases the optimizer can't see and can't tune against, and to score against those <em>last</em>, and to let a failure there be final... no re-optimizing until the held-out finally says yes, because that's just teaching it the answers slowly.</p>
+      <p>I didn't invent that discipline, and I find it reassuring that I didn't. NVIDIA's SoL-Pi work builds harness improvements this way and names the sealed, no-feedback held-out as the thing that stops the loop from overfitting itself. Salesforce's own research, SFR-AutoR&D, does the strict version for code: the improved function has to produce byte-identical output to the original across a big matrix of cases before any speedup counts. That's an oracle you can't sweet-talk. When a competitor's lab and your own lab both land on "the check is the hard part," you stop treating it as a detail.</p>
+    </div>
+  </section>
+
+  <!-- 6. AUTONOMY INSIDE A FENCE -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Autonomy Inside a Fence</h2>
+    <div class="grid md:grid-cols-5 gap-10 items-start">
+      <div class="md:col-span-3 prose-lg text-slate-300 text-lg">
+        <p>Here's where custody from Part 8 does its second job. The loop is allowed to run free on things that don't matter if it gets one wrong... a log compressor, a formatting pass, throwaway targets. The moment a proposed change touches the safety layer itself, the checks, the trust root, the rules about who can approve what, it is not applied. It's handed to the human at the custody line, the same line the builder couldn't cross in Part 8.</p>
+        <p>So "fully autonomous" has a hard boundary baked in, and it's the honest kind. It never means the loop rewrites its own guardrails while no one's looking. It means the loop improves the work, and a person still owns the thing that decides what "improved" is allowed to mean.</p>
+      </div>
+      <div class="md:col-span-2 glass rounded-2xl p-6">
+        <svg viewBox="0 0 320 220" class="w-full" role="img" aria-label="The loop runs free outside the fence; governed changes route to the owner.">
+          <rect x="12" y="16" width="296" height="120" rx="12" fill="rgba(52,211,153,.05)" stroke="#1e2b45" stroke-dasharray="4 4"/>
+          <text x="26" y="36" fill="#34d399" font-family="JetBrains Mono" font-size="10">non-governed · loop runs free</text>
+          <rect x="30" y="52" width="110" height="34" rx="8" fill="#111a2e" stroke="#1e2b45"/><text x="85" y="73" text-anchor="middle" fill="#93c5fd" font-family="JetBrains Mono" font-size="10">propose</text>
+          <rect x="170" y="52" width="110" height="34" rx="8" fill="#111a2e" stroke="#1e2b45"/><text x="225" y="73" text-anchor="middle" fill="#93c5fd" font-family="JetBrains Mono" font-size="10">gate + keep</text>
+          <line x1="140" y1="69" x2="170" y2="69" stroke="#1e2b45" stroke-width="2"/>
+          <rect x="12" y="156" width="296" height="52" rx="12" fill="rgba(167,139,250,.06)" stroke="#a78bfa"/>
+          <text x="26" y="176" fill="#a78bfa" font-family="JetBrains Mono" font-size="10">governed · routes to the owner 🔑</text>
+          <text x="26" y="196" fill="#64748b" font-family="Inter" font-size="11">the loop can never self-approve a safety-layer change</text>
+          <line x1="225" y1="86" x2="160" y2="156" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 3"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. PROVEN VS BET -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">What's Proven, and What's Still a Bet</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>Worth separating what ran from what I'm arguing. The pieces of the loop exist and work. There's a hand-built version of the whole shape... a compressor whose own verifier rejects it and falls back to the original if it can't prove the compression was faithful. And the loop ran for real on a governed agent I built for Part 10: the held-out check caught a genuine gap, I fixed it, re-ran, and it went green. Propose, gate, catch, fix, re-gate... that cycle is not a diagram, it happened.</p>
+      <p class="pull pl-5 text-slate-200 text-xl font-light my-8">What I am <em>not</em> claiming is compounding. One gated improvement is real. A flywheel where each improvement makes the next one easier is a hope, not a result... SoL-Pi calls that a future direction too, and I'll hold myself to the same honesty. One good change at a time, each earned against a check that can fail.</p>
+    </div>
+  </section>
+
+  <!-- 8. WHERE THIS IS THIN -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Where This Is Thin</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p><span class="text-amber font-medium">The whole thing rests on one un-gameable check, and not every check is un-gameable.</span> Code with a differential test is the good case... the original function is a perfect oracle. A judge scoring an agent's answer is the weak case, because a clever loop can learn to please the judge. Where the oracle is soft, the sealed held-out is doing all the work, and I trust the loop exactly as far as I trust that wall.</p>
+      <p><span class="text-amber font-medium">Sealed is a discipline, not a lock.</span> Nothing physically stops a careless operator from letting held-out results leak back into the proposer. The isolation is enforced by how the loop is wired, and a wiring mistake quietly turns autonomy back into overfitting. That failure is silent, which is the dangerous kind.</p>
+      <p><span class="text-amber font-medium">Every number here is measured on my own targets.</span> The published results from other labs are theirs, on their harnesses and their benchmarks. I don't get to borrow their percentages, and I haven't. When I quote an improvement, it's one I measured on the thing in front of me.</p>
+    </div>
+  </section>
+
+  <!-- 9. SO WHAT -->
+  <section class="py-16 md:py-24 reveal">
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">So What, Then</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>For eight parts the harness was something I improved. Part 9 is the first time it improves itself, and the surprise is that the interesting engineering isn't the part that writes the change. It's the part that refuses to be fooled by it. Autonomy didn't come from a smarter proposer. It came from a check the proposer can't see and can't argue with, and a fence it can't climb.</p>
+      <p>Which leaves one question, and it's the one the whole series has been walking toward. If the durable thing is the harness, the checks and the custody and the loop, and none of it depends on which model you rent this quarter... then where should all of that actually live? Not in my scaffold. Part 10 puts it where it belongs: in the platform itself.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-line mt-10">
+  <div class="max-w-5xl mx-auto px-6 py-12 text-slate-500 text-sm font-mono flex flex-col md:flex-row justify-between gap-4">
+    <span>Context Engineering Series · Part 9 · John Tehrani</span>
+    <span>Autonomy on a leash.</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ---- micro-demo: the gate that can fail ----
+  // Each candidate's outcome at each gate. The cheater passes the two VISIBLE gates
+  // and is caught ONLY by the sealed held-out — that's the whole point.
+  const OUTCOMES = {
+    real:  { cap: true,  imp: true,  held: true,  msg: 'Promoted. Cleared every gate, including the cases it never saw.' },
+    noop:  { cap: true,  imp: false, held: null,  msg: 'Reverted. Correct, but it improved nothing — gate 2 stops it, and the held-out never runs.' },
+    cheat: { cap: true,  imp: true,  held: false, msg: 'Reverted. It gamed the visible tests, then the sealed held-out caught it. This is the case that matters.' },
+  };
+  const gates = ['cap','imp','held'];
+  let selected = null;
+  const cands = document.querySelectorAll('#cands .cand');
+  const runBtn = document.getElementById('run');
+  const resultEl = document.getElementById('result');
+
+  function resetGates() {
+    gates.forEach(g => {
+      const el = document.querySelector(`.gate[data-g="${g}"]`);
+      el.classList.remove('on','pass','fail');
+      const v = el.querySelector('.verdict'); v.style.opacity = '0'; v.textContent = '—'; v.className = 'verdict font-mono text-xs mt-2 opacity-0';
+    });
+    resultEl.textContent = '';
+  }
+  cands.forEach(c => c.addEventListener('click', () => {
+    cands.forEach(x => x.classList.remove('sel'));
+    c.classList.add('sel');
+    selected = c.dataset.c;
+    runBtn.disabled = false;
+    resetGates();
+  }));
+
+  runBtn.addEventListener('click', () => {
+    if (!selected) return;
+    runBtn.disabled = true;
+    resetGates();
+    const o = OUTCOMES[selected];
+    let i = 0;
+    const step = () => {
+      if (i >= gates.length) {
+        resultEl.textContent = o.msg;
+        resultEl.className = 'font-mono text-sm ' + (o.held === true ? 'text-emerald' : 'text-red');
+        runBtn.disabled = false;
+        return;
+      }
+      const g = gates[i];
+      const el = document.querySelector(`.gate[data-g="${g}"]`);
+      el.classList.add('on');
+      const outcome = o[g];
+      const v = el.querySelector('.verdict');
+      if (outcome === null) {
+        el.classList.add('fail'); v.textContent = 'not reached'; v.className = 'verdict font-mono text-xs mt-2 text-slate-500';
+        i = gates.length; setTimeout(step, 450); return;
+      }
+      el.classList.add(outcome ? 'pass' : 'fail');
+      v.textContent = outcome ? 'PASS' : 'REJECT';
+      v.className = 'verdict font-mono text-xs mt-2 ' + (outcome ? 'text-emerald' : 'text-red');
+      if (!outcome) { i = gates.length; setTimeout(step, 550); return; }
+      i++; setTimeout(step, 550);
+    };
+    setTimeout(step, 200);
+  });
+</script>
+</body>
+</html>
