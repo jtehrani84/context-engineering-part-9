@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The Harness That Improves Itself — Context Engineering, Part 9</title>
-<meta name="description" content="Part 9 of the Context Engineering series: the harness stops being something I improve and starts proposing its own changes — inside a gate that can fail, a sealed held-out that never feeds back, and a custody line the loop can't cross. Autonomy on a leash." />
+<title>The Harness That Improves Itself, Context Engineering, Part 9</title>
+<meta name="description" content="Part 9 of the Context Engineering series: the harness stops being something I improve and starts proposing its own changes, inside a gate that can fail, a sealed held-out that never feeds back, and a custody line the loop can't cross. Autonomy on a leash." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -72,7 +72,7 @@
       The Harness That<br class="hidden md:block" /> <span class="grad">Improves Itself</span>
     </h1>
     <p class="mt-8 max-w-3xl text-lg md:text-2xl text-slate-300 font-light leading-relaxed">
-      Part 8 made the harness safe and portable. It could catch how work goes wrong, and a human held the key. But it still couldn't do one thing... write its own improvements. Part 9 closes that loop, and the only reason it's safe to close is a check the loop is not allowed to grade for itself.
+      Part 8 left me with a harness that could catch how work goes wrong and a human holding the key to it, and it still couldn't write a single improvement to itself. In Part 7 I said that self-writing part was maybe an October job. It's October now, and Part 9 closes that loop, which is only safe because of one check the loop isn't allowed to grade for itself.
     </p>
     <div class="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs md:text-sm text-slate-400">
       <span>propose → gate → promote or revert</span><span class="rule">·</span>
@@ -84,30 +84,22 @@
 
 <main class="max-w-5xl mx-auto px-6">
 
-  <!-- 2. WHAT PART 8 LEFT HALF-BUILT -->
+  <!-- 1. WHERE PART 8 STOPPED -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">What Part 8 Left Half-Built</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Where Part 8 Stopped</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>Part 7 built a guard that could grade my work. Part 8 gave that guard a spine... it caught more than voice, it traveled across runtimes, and a human, not the agent, held the key that could change it. But everything in Part 8 still waited for me to decide what to change. The guard could say "this is wrong." It couldn't say "here's a better version, and here's the proof it's better."</p>
-      <p>That's the half Part 7 deferred out loud, when I said the self-writing part was maybe an October job. This is October. The reason it was worth waiting is that a loop which writes its own changes is only as safe as the thing that decides which changes to keep. Build that decider wrong and "autonomous" just means "autonomously gets worse in a way that looks like progress." So the whole of Part 9 is really about one component: the check.</p>
+      <p>Part 7 built a guard that could grade my work, and Part 8 gave that guard a spine... it caught more than voice, it traveled across runtimes, and only a human held the key that could change it. But it couldn't propose anything on its own, every change still waited for me to decide on it, so the guard could say "this is wrong" and it couldn't say "here's a better version, and here's the proof it's better." For eight parts I improved the harness by hand, and Part 9 is the first time it improves itself.</p>
+      <p>I waited on the self-writing part because a loop that writes its own changes is only as safe as whatever decides which changes to keep. Get that decider wrong and "autonomous" just means autonomously getting worse in a way that looks like progress, so before I let anything propose a change, I had to build something that could say no to it.</p>
     </div>
   </section>
 
-  <!-- 3. THE LOOP -->
+  <!-- 2. TWO GATES AND A SEALED SET -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Loop</h2>
-    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>The shape is small. Pick a target the loop is allowed to touch. A cheap model proposes a change. Then the change has to clear two gates before anything happens: it can't make any existing capability worse, and it has to improve at least one thing we declared we cared about, by a margin we can actually measure. Whatever survives gets checked one more time against a set of cases it has never seen and cannot influence. Clear that, and the change is kept. Fail it, and the change is thrown away and the baseline stands.</p>
-      <p>Nothing here is exotic. A coding agent already proposes changes all day. The two gates are the same preserve-and-extend rule the voice work used from the start. The one piece that makes it autonomy instead of a suggestion box is that last check, the sealed one, and the discipline that it never, ever gets to teach the proposer how to pass it.</p>
-    </div>
-  </section>
-
-  <!-- 4. MICRO-DEMO: THE GATE THAT CAN FAIL -->
-  <section class="py-16 md:py-24 reveal">
-    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Interactive · try it</div>
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Gate That Can Fail</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Two Gates and a Sealed Set</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg mb-8">
-      <p>Pick a candidate change and send it through the loop. Two of them look good on the tests the proposer can see. Only one of them survives the sealed held-out. That gap is the whole reason this is safe.</p>
+      <p>How do you know a change the loop wrote is actually better? The loop itself is small, I pick a target it's allowed to touch, a cheap model proposes a change, and the change has to clear two gates before anything happens. It can't make any existing capability worse, and it has to improve at least one thing we declared we cared about, by a margin we can actually measure. Whatever survives gets checked one more time against a set of cases it has never seen and can't influence, and if it clears that set the change is kept. If it fails, the change is thrown away and the baseline stands.</p>
+      <p>A coding agent already proposes changes all day, and the two gates are the same preserve-and-extend rule the voice work used from the start. The sealed set is what turns a suggestion box into something I can leave running, as long as it never gets to teach the proposer how to pass it.</p>
+      <p>I built a toy version with three candidate changes so you can watch the gates work. Two of them look good on the tests the proposer can see and only one survives the sealed held-out, so pick one, press Run the loop, and see where it stops.</p>
     </div>
 
     <div class="glass rounded-2xl p-6 md:p-8">
@@ -134,19 +126,19 @@
           <div class="font-mono text-xs text-slate-500 mb-1">gate 1</div>
           <div class="text-slate-200 text-sm font-medium">Capability held</div>
           <div class="text-slate-500 text-xs mt-1">Nothing that worked before got worse.</div>
-          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">·</div>
         </div>
         <div class="gate p-4" data-g="imp">
           <div class="font-mono text-xs text-slate-500 mb-1">gate 2</div>
           <div class="text-slate-200 text-sm font-medium">Actually improved</div>
           <div class="text-slate-500 text-xs mt-1">At least one metric up, by a real margin.</div>
-          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">·</div>
         </div>
         <div class="gate p-4" data-g="held">
           <div class="font-mono text-xs text-violet mb-1">sealed held-out</div>
           <div class="text-slate-200 text-sm font-medium">Cases it never saw</div>
           <div class="text-slate-500 text-xs mt-1">Frozen. The proposer can't influence it.</div>
-          <div class="verdict font-mono text-xs mt-2 opacity-0">—</div>
+          <div class="verdict font-mono text-xs mt-2 opacity-0">·</div>
         </div>
       </div>
 
@@ -155,25 +147,27 @@
         <div id="result" class="font-mono text-sm text-slate-400"></div>
       </div>
     </div>
-    <p class="mt-5 max-w-3xl text-slate-500 text-sm">The cheater is the point. It sails through the two gates the proposer can see, because it was built to. The sealed held-out is the only thing that catches it, and it can only catch it because the proposer was never allowed to learn what's in it. Remove that wall and the loop optimizes the wall instead of the work.</p>
+    <p class="mt-5 max-w-3xl text-slate-500 text-sm">When I run all three, A clears everything. B is correct and improves nothing, so gate 2 reverts it and the held-out never runs. C sails through both visible gates because it was built to, and only the sealed set catches it, which works only because the proposer never got to learn what's in that set. The three candidates are made up for the demo, but the pieces of the loop exist and work, and there's a hand-built version of the whole shape, a compressor whose own verifier rejects it and falls back to the original if it can't prove the compression was faithful.</p>
   </section>
 
-  <!-- 5. WHY SEALED -->
+  <!-- 3. WHY THE HELD-OUT CAN'T FEED BACK -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Why the Held-Out Stays Sealed</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Why the Held-Out Can't Feed Back</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>Any metric a system is optimized against stops being a good metric. Point a loop at a score and it will find the cheapest way to move the number, which is rarely the same as doing the work well. The only defense that holds is to keep a set of cases the optimizer can't see and can't tune against, and to score against those <em>last</em>, and to let a failure there be final... no re-optimizing until the held-out finally says yes, because that's just teaching it the answers slowly.</p>
-      <p>I didn't invent that discipline, and I find it reassuring that I didn't. NVIDIA's SoL-Pi work builds harness improvements this way and names the sealed, no-feedback held-out as the thing that stops the loop from overfitting itself. Salesforce's own research, SFR-AutoR&D, does the strict version for code: the improved function has to produce byte-identical output to the original across a big matrix of cases before any speedup counts. That's an oracle you can't sweet-talk. When a competitor's lab and your own lab both land on "the check is the hard part," you stop treating it as a detail.</p>
+      <p>Candidate C is a small version of an old problem. Any metric a system is optimized against stops being a good metric, so point a loop at a score and it'll find the cheapest way to move the number, which is rarely the same as doing the work well. The defense I trust is a set of cases the optimizer can't see or tune against, scored <em>last</em>, where a failure is final... no re-optimizing until the held-out finally says yes, because that's just teaching it the answers slowly.</p>
+      <p>NVIDIA's SoL-Pi work builds harness improvements this way and names the sealed, no-feedback held-out as the thing that stops the loop from overfitting itself. Salesforce's own research, SFR-AutoR&amp;D, does the strict version for code, where the improved function has to produce byte-identical output to the original across a big matrix of cases before any speedup counts. Their published results are theirs, on their harnesses and their benchmarks, and I haven't borrowed their percentages, every number on this page is one I measured on my own targets.</p>
+      <p>So a competitor's lab and my own company's researchers both treat the check as the hard part, and after this month I stopped treating it as a detail. Writing a change turned out to be the easy half of this loop, and the hard engineering is in the check that refuses to be fooled by one. That check is where the loop's autonomy comes from, because the proposer can't see it or argue with it, and a smarter proposer wouldn't have bought me any of it.</p>
+      <p>The loop has also run for real on a governed agent I built for Part 10, where the held-out check caught a genuine gap, I fixed it, re-ran, and it went green. That's one gated improvement, and I'm not claiming compounding. A flywheel where each improvement makes the next one easier is still a hope, and SoL-Pi calls it a future direction too.</p>
     </div>
   </section>
 
-  <!-- 6. AUTONOMY INSIDE A FENCE -->
+  <!-- 4. WHAT THE LOOP IS ALLOWED TO TOUCH -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Autonomy Inside a Fence</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">What the Loop Is Allowed to Touch</h2>
     <div class="grid md:grid-cols-5 gap-10 items-start">
       <div class="md:col-span-3 prose-lg text-slate-300 text-lg">
-        <p>Here's where custody from Part 8 does its second job. The loop is allowed to run free on things that don't matter if it gets one wrong... a log compressor, a formatting pass, throwaway targets. The moment a proposed change touches the safety layer itself, the checks, the trust root, the rules about who can approve what, it is not applied. It's handed to the human at the custody line, the same line the builder couldn't cross in Part 8.</p>
-        <p>So "fully autonomous" has a hard boundary baked in, and it's the honest kind. It never means the loop rewrites its own guardrails while no one's looking. It means the loop improves the work, and a person still owns the thing that decides what "improved" is allowed to mean.</p>
+        <p>A sealed set can tell the loop a change made things worse, and it can't decide what the loop should be allowed to change in the first place, which is where custody from Part 8 picks up a second job. The loop runs free on things that don't matter much if it gets one wrong... a log compressor, a formatting pass, throwaway targets. The moment a proposed change touches the safety layer itself, meaning the checks, the trust root, and the rules about who can approve what, it isn't applied. It goes to the human at the custody line, the same line the builder couldn't cross in Part 8.</p>
+        <p>So when I call the loop fully autonomous, I mean it improves the work on those low-stakes targets while a person still owns what "improved" is allowed to mean, and it never gets to rewrite its own guardrails while nobody's looking.</p>
       </div>
       <div class="md:col-span-2 glass rounded-2xl p-6">
         <svg viewBox="0 0 320 220" class="w-full" role="img" aria-label="The loop runs free outside the fence; governed changes route to the owner.">
@@ -191,32 +185,21 @@
     </div>
   </section>
 
-  <!-- 7. PROVEN VS BET -->
+  <!-- 5. THE LOOP PICKS THE MODEL TOO -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">What's Proven, and What's Still a Bet</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Loop Picks the Model Too</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>Worth separating what ran from what I'm arguing. The pieces of the loop exist and work. There's a hand-built version of the whole shape... a compressor whose own verifier rejects it and falls back to the original if it can't prove the compression was faithful. And the loop ran for real on a governed agent I built for Part 10: the held-out check caught a genuine gap, I fixed it, re-ran, and it went green. Propose, gate, catch, fix, re-gate... that cycle is not a diagram, it happened.</p>
-      <p class="pull pl-5 text-slate-200 text-xl font-light my-8">What I am <em>not</em> claiming is compounding. One gated improvement is real. A flywheel where each improvement makes the next one easier is a hope, not a result... SoL-Pi calls that a future direction too, and I'll hold myself to the same honesty. One good change at a time, each earned against a check that can fail.</p>
+      <p>The thing the loop proposes doesn't have to be an instruction, it can be a cheaper model. Most tasks don't need a frontier brain... mapping some fields, reformatting, a routine bit of code. So the loop can propose running a route on a smaller, cheaper model, and that proposal goes through the same sealed held-out eval as any other change. It keeps the cheaper model only if it clears a bar it can't see, and it falls back to the bigger one if it doesn't.</p>
+      <p>There's a second reason to reach for a different model, and it has nothing to do with cost. When the thing being checked is my own work, the worst judge is another copy of me, because it shares my blind spots, so the check that decides what's kept runs on a different lab's model than the one that proposed the change. I measured this earlier in the series, a same-model judge graded its own house style about twelve points too kind, and the different-vendor judge didn't.</p>
+      <p class="text-slate-400 text-base">Both of these are wired and tested, and neither runs on its own yet. A cheaper model stays a candidate until an eval promotes it, and today nothing's been promoted, so what I could do next was point the cross-vendor half at actual work and watch what it did.</p>
     </div>
   </section>
 
-  <!-- 7b. THE LOOP ALSO PICKS THE BRAIN -->
+  <!-- 6. A SCHOOL'S ENROLLMENT SCHEMA -->
   <section class="py-16 md:py-24 reveal">
-    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">The same gate, one more job</div>
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Loop Also Picks the Brain</h2>
-    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>The thing the loop proposes doesn't have to be an instruction. It can be a cheaper model. Most tasks don't need a frontier brain... mapping some fields, reformatting, a routine bit of code. So the loop can propose running a route on a smaller, cheaper model, and that proposal faces the exact same wall as any other change: the sealed held-out eval. Keep the cheaper brain only if it clears the bar it can't see, and fall back to the bigger one if it doesn't. A cheaper model is never assumed adequate, it's earned against a check that can fail.</p>
-      <p>There's a second reason to reach for a different model, and it has nothing to do with cost. When the thing being checked is my own work, the worst judge is another copy of me, because it shares my blind spots. So the check that decides what's kept runs on a different lab's model than the one that proposed the change. Proposer and judge are different brains on purpose. I measured this earlier in the series: a same-model judge graded its own house style about twelve points too kind. A different-vendor judge doesn't.</p>
-      <p class="text-slate-400 text-base">Both of these are wired and tested, and neither runs on its own yet. A cheaper model stays a candidate until an eval promotes it, and nothing is promoted today. That's the honest state, and it's the right order... the mechanism should exist before the autonomy does.</p>
-    </div>
-  </section>
-
-  <!-- 7c. INTERACTIVE: THE CROSS-VENDOR LOOP (case study) -->
-  <section class="py-16 md:py-24 reveal">
-    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Interactive · seen in practice</div>
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">The Cross-Vendor Loop, Run for Real</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">A School's Enrollment Schema</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg mb-8">
-      <p>I put that idea through a real task, not a toy one: design the enrollment CRM schema for a small private school that wants to grow. It's exactly the kind of work I author myself, which is what makes it a fair test... does a second opinion from a different lab actually change the answer? Walk the loop, one step at a time.</p>
+      <p>The task I picked was designing the enrollment CRM schema for a small private school that wants to grow. It's the kind of work I author myself, which made it a fair test of the thing I wanted to know... does a second opinion from a different lab actually change the answer? You can click through the six steps it went through.</p>
     </div>
     <div class="grid md:grid-cols-2 gap-6">
       <div class="grid grid-cols-2 gap-2" id="loopRows">
@@ -231,17 +214,16 @@
         <div class="text-slate-500 text-sm font-mono">Select a step in the loop.</div>
       </div>
     </div>
-    <p class="mt-6 max-w-3xl text-slate-500 text-sm">Two other labs' models, one design task, and the return was the disagreement. The catch that mattered was a governance one a copy of me would likely have shipped. That's the whole case for routing your own work past a different brain.</p>
+    <p class="mt-6 max-w-3xl text-slate-500 text-sm">The two labs disagreed in three places, and the one that mattered was whether to store each family's religion, employer, and income to target them. One lab treated that data as a growth lever and the other refused it as a privacy-and-fairness landmine, and that governance catch is one a copy of me would likely have shipped right past.</p>
   </section>
 
-  <!-- 7d. THE SAME LOOP, ON CODE -->
+  <!-- 7. THEN A RATE LIMITER -->
   <section class="py-16 md:py-24 reveal">
-    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Seen in practice · on code this time</div>
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">Then I Ran the Same Loop on Code</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">Then a Rate Limiter</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>The schema task ends on a reconciled design, which is still somebody's opinion, and with code I could end on a test instead, so I ran the loop again on a small build, a token-bucket rate limiter, which looks trivial and is full of floating-point traps. Opus wrote the spec and a starter set of tests, then handed the build to a Sonnet subagent. Sonnet's first version was good, it passed all five starter tests.</p>
-      <p>Then the code went out through OpenCode to two other labs for an adversarial architect review, OpenAI's model and xAI's Grok. Grok timed out twice, so the router sent the second audit to Google's Gemini and kept going, but the cause turned out to be mine... Grok is a thinking model that spent its whole output budget thinking on a long document, and my script only waited two minutes. Nobody edited a config file... the only rule the harness cared about was that the reviewer couldn't come from the lab that wrote the code.</p>
-      <p>Seven findings came back, and this is the step I think matters most. It's tempting to hand the auditors' list straight to the builder. Opus judged it instead, and every finding had to become a failing test against Sonnet's code before it earned a fix.</p>
+      <p>A reconciled design is still somebody's opinion, and with code I could end on a test instead, so I ran the loop again on a small build, a token-bucket rate limiter, which looks trivial and is full of floating-point traps. Opus wrote the spec and a starter set of tests and handed the build to a Sonnet subagent, and Sonnet's first version was good, it passed all five starter tests.</p>
+      <p>Then the code went out through OpenCode to two other labs for an adversarial architect review, OpenAI's model and xAI's Grok. Grok timed out twice, so the router sent the second audit to Google's Gemini and kept going, and nobody edited a config file to make that happen, because the only rule the harness cared about was that the reviewer couldn't come from the lab that wrote the code. The timeouts turned out to be my fault. Grok is a thinking model that spent its whole output budget thinking on a long document, and my script waited a grand total of two minutes for it.</p>
+      <p>Seven findings came back, and the easy move is to hand a list like that straight to the builder. Opus judged it instead, and every finding had to become a failing test against Sonnet's code before it earned a fix.</p>
     </div>
     <div class="glass rounded-2xl p-6 md:p-8 my-8 max-w-4xl overflow-x-auto">
       <table class="w-full text-sm">
@@ -262,30 +244,27 @@
       </table>
     </div>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>OpenAI's model also questioned how the spec described the clock, and there the code was right and the wording was loose, so the code stayed. The revised build plan came back as four new failing tests plus a fix list that was just as clear about what not to touch. Sonnet fixed those four, left the dismissed one alone, and both suites went green, five of five and four of four. I re-ran them myself instead of taking the subagent's word for it.</p>
+      <p>The dismissed row is the easy one to get wrong, because a tolerance that lets three refills of 0.3 add up to 0.9 sounds like good floating-point manners right up until you notice it hands out tokens that don't exist. OpenAI's model also questioned how the spec described the clock, and there the code was right and the wording was loose, so the code stayed. The revised build plan came back as four new failing tests plus a fix list that was just as clear about what not to touch. Sonnet fixed those four, left the dismissed one alone, and both suites went green, five of five and four of four, and I re-ran them myself before I believed the subagent.</p>
       <p class="text-slate-400 text-base">I was still the one driving it, one session and one build, and a rate limiter is the friendly kind of target where a test settles every argument... so this is a long way from the loop running on its own.</p>
-      <p>Prose has no test to settle an argument, so when the same loop had OpenAI's and Google's models review the Part 10 page and its build spec, every finding got checked against the source where it would be true first. Eight of the 24 merged findings were wrong, like reviewers treating 2026 dates as the future, and the check still caught a real error I'd shipped, the page said the employee agent runs as its own user when it runs as the signed-in user, with that person's permissions and sharing. Grok's spec review only came back after the fix, because at 8K and 16K tokens it had returned nothing and at 32K it took about two and a half minutes, so now it gets a bigger budget, a longer wait, and an empty answer fails loudly.</p>
     </div>
   </section>
 
-  <!-- 8. WHERE THIS IS THIN -->
+  <!-- 8. REVIEWING PART 10 -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Places I Don't Trust It Yet</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Reviewing the Part 10 Page</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p><span class="text-amber font-medium">The whole thing rests on one un-gameable check, and not every check is un-gameable.</span> Code with a differential test is the good case, where the original function is a perfect oracle. A judge scoring an agent's answer is the weak case, because a clever loop can learn to please the judge. Where the oracle is soft, the sealed held-out is doing all the work, and I trust the loop exactly as far as I trust that wall.</p>
-      <p><span class="text-amber font-medium">Sealed is a discipline, not a lock.</span> Nothing physically stops a careless operator from letting held-out results leak back into the proposer. The isolation is enforced by how the loop is wired, and a wiring mistake quietly turns autonomy back into overfitting. That failure is silent, which is the dangerous kind.</p>
-      <p>I've shipped a silent failure like that myself, in the hooks of the <a href="https://github.com/jtehrani84/claude-code-se-starter-kit" class="text-cyan hover:underline">public starter kit</a> I share with other SEs. They printed a “result” field Claude Code doesn't read, so the guardrail hook detected a force-push to main and let it run, and every warning nudge got dropped. They'd looked fine as code, and only a headless run in a scratch repo showed it. Re-running setup upgrades any hook you haven't edited, and it's one small data point for why Part 10 puts what the harness proved into the platform's own primitives, since a check you bolt on can fail quietly.</p>
-      <p><span class="text-amber font-medium">Every number here is measured on my own targets.</span> The published results from other labs are theirs, on their harnesses and their benchmarks. I don't get to borrow their percentages, and I haven't. When I quote an improvement, it's one I measured on the thing in front of me.</p>
+      <p>Prose doesn't have a test like that, so when the same loop had OpenAI's and Google's models review the Part 10 page and its build spec, every finding got checked first against the source where it would be true. Eight of the 24 merged findings were wrong, like reviewers treating 2026 dates as the future, and the check still caught an error I'd shipped, where the page said the employee agent runs as its own user when it runs as the signed-in user, with that person's permissions and sharing. Grok's spec review only came back after I fixed that budget and the wait. At 8K and 16K tokens it had returned nothing and at 32K it took about two and a half minutes, so now it gets a bigger budget and a longer wait, and an empty answer fails loudly.</p>
+      <p>A review like that one is where I trust the loop least, because not every check is as hard to game as a test. Code with a differential test is the good case, since the original function is a perfect oracle, and a judge scoring an agent's answer is the weak case, because a clever loop can learn to please the judge. Where the oracle is soft, the sealed held-out is doing all the work, and I trust the loop exactly as far as I trust that set.</p>
     </div>
   </section>
 
-  <!-- 9. SO WHAT -->
+  <!-- 9. THE HOOK NOBODY HEARD -->
   <section class="py-16 md:py-24 reveal">
-    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Part That Surprised Me</h2>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Hook Nobody Heard</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>For eight parts the harness was something I improved by hand. Part 9 is the first time it improves itself, and what surprised me is that the hard, interesting engineering isn't the part that writes the change at all, it's the part that refuses to be fooled by it. The autonomy didn't come from a smarter proposer, it came from a check the proposer can't see or argue with, sitting behind a fence it can't climb.</p>
-      <p>Which leaves one question, and it's the one the whole series has been walking toward. If the durable thing is the harness, the checks and the custody and the loop, and none of it depends on which model you rent this quarter... then where should all of that actually live? Not in my scaffold. Part 10 puts it where it belongs: in the platform itself.</p>
-      <p class="mt-6">That's next, and it's the last one: <a href="https://jtehrani84.github.io/context-engineering-part-10/">read Part 10 →</a></p>
+      <p>And the seal itself is kept by discipline. Nothing physically stops a careless operator from letting held-out results leak back into the proposer, the isolation is enforced by how the loop is wired, and a wiring mistake turns autonomy back into overfitting without anything telling you it happened.</p>
+      <p>I've shipped a silent failure like that myself, in the hooks of the <a href="https://github.com/jtehrani84/claude-code-se-starter-kit" class="text-cyan hover:underline">public starter kit</a> I share with other SEs. They printed a “result” field Claude Code doesn't read, so the guardrail hook detected a force-push to main and let it run anyway, and every warning nudge got dropped the same way. The hooks had looked fine as code, and only a headless run in a scratch repo showed it. Re-running setup upgrades any hook you haven't edited.</p>
+      <p>That's one small data point for why Part 10 puts what the harness proved into the platform's own primitives. If the part that lasts is the checks and the custody and the loop, and none of it depends on which model you rent this quarter, where should it live when a check I bolt onto my own scaffold can fail and nobody hears it? Part 10 puts it in the platform itself, and it's the last one, so go <a href="https://jtehrani84.github.io/context-engineering-part-10/">read Part 10 →</a></p>
     </div>
   </section>
 
@@ -304,10 +283,10 @@
 
   // ---- micro-demo: the gate that can fail ----
   // Each candidate's outcome at each gate. The cheater passes the two VISIBLE gates
-  // and is caught ONLY by the sealed held-out — that's the whole point.
+  // and is caught ONLY by the sealed held-out. That's the whole point.
   const OUTCOMES = {
     real:  { cap: true,  imp: true,  held: true,  msg: 'Promoted. Cleared every gate, including the cases it never saw.' },
-    noop:  { cap: true,  imp: false, held: null,  msg: 'Reverted. Correct, but it improved nothing — gate 2 stops it, and the held-out never runs.' },
+    noop:  { cap: true,  imp: false, held: null,  msg: 'Reverted. Correct, but it improved nothing. Gate 2 stops it, and the held-out never runs.' },
     cheat: { cap: true,  imp: true,  held: false, msg: 'Reverted. It gamed the visible tests, then the sealed held-out caught it. This is the case that matters.' },
   };
   const gates = ['cap','imp','held'];
@@ -320,7 +299,7 @@
     gates.forEach(g => {
       const el = document.querySelector(`.gate[data-g="${g}"]`);
       el.classList.remove('on','pass','fail');
-      const v = el.querySelector('.verdict'); v.style.opacity = '0'; v.textContent = '—'; v.className = 'verdict font-mono text-xs mt-2 opacity-0';
+      const v = el.querySelector('.verdict'); v.style.opacity = '0'; v.textContent = '·'; v.className = 'verdict font-mono text-xs mt-2 opacity-0';
     });
     resultEl.textContent = '';
   }
