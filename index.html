@@ -234,6 +234,39 @@
     <p class="mt-6 max-w-3xl text-slate-500 text-sm">Two other labs' models, one design task, and the return was the disagreement. The catch that mattered was a governance one a copy of me would likely have shipped. That's the whole case for routing your own work past a different brain.</p>
   </section>
 
+  <!-- 7d. THE SAME LOOP, ON CODE -->
+  <section class="py-16 md:py-24 reveal">
+    <div class="font-mono text-xs uppercase eyebrow text-emerald mb-3">Seen in practice · on code this time</div>
+    <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-6">Then I Ran the Same Loop on Code</h2>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>The schema task ends on a reconciled design, which is still somebody's opinion, and with code I could end on a test instead, so I ran the loop again on a small build, a token-bucket rate limiter, which looks trivial and is full of floating-point traps. Opus wrote the spec and a starter set of tests, then handed the build to a Sonnet subagent. Sonnet's first version was good, it passed all five starter tests.</p>
+      <p>Then the code went out through OpenCode to two other labs for an adversarial architect review, OpenAI's model and xAI's Grok. Grok timed out twice, so the router sent the second audit to Google's Gemini and kept going. Nobody edited a config file... the only rule the harness cared about was that the reviewer couldn't come from the lab that wrote the code.</p>
+      <p>Seven findings came back, and this is the step I think matters most. It's tempting to hand the auditors' list straight to the builder. Opus judged it instead, and every finding had to become a failing test against Sonnet's code before it earned a fix.</p>
+    </div>
+    <div class="glass rounded-2xl p-6 md:p-8 my-8 max-w-4xl overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left font-mono text-xs uppercase eyebrow text-slate-500">
+            <th class="pb-3 pr-4 font-normal">What the auditors found</th>
+            <th class="pb-3 pr-4 font-normal">Who</th>
+            <th class="pb-3 font-normal">Verdict</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">A refill rate of zero times an infinite time gap turns the token count into NaN</td><td class="py-3 pr-4 text-slate-400">both labs</td><td class="py-3 text-emerald">real · failing test</td></tr>
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">A NaN clock reading slips straight past the time guard</td><td class="py-3 pr-4 text-slate-400">Gemini</td><td class="py-3 text-emerald">real · failing test</td></tr>
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">Very small refills round away and are lost for good (two findings, one root cause)</td><td class="py-3 pr-4 text-slate-400">OpenAI</td><td class="py-3 text-emerald">real · failing test</td></tr>
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">A capacity too large to count down one token at a time</td><td class="py-3 pr-4 text-slate-400">OpenAI</td><td class="py-3 text-emerald">real · now rejected</td></tr>
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">Add a tolerance so three refills of 0.3 add up to 0.9</td><td class="py-3 pr-4 text-slate-400">Gemini</td><td class="py-3 text-amber">dismissed · it would hand out tokens that don't exist</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose-lg max-w-3xl text-slate-300 text-lg">
+      <p>OpenAI's model also questioned how the spec described the clock, and there the code was right and the wording was loose, so the code stayed. The revised build plan came back as four new failing tests plus a fix list that was just as clear about what not to touch. Sonnet fixed those four, left the dismissed one alone, and both suites went green, five of five and four of four. I re-ran them myself instead of taking the subagent's word for it.</p>
+      <p class="text-slate-400 text-base">I was still the one driving it, one session and one build, and a rate limiter is the friendly kind of target where a test settles every argument... so this is a long way from the loop running on its own.</p>
+    </div>
+  </section>
+
   <!-- 8. WHERE THIS IS THIN -->
   <section class="py-16 md:py-24 reveal">
     <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Places I Don't Trust It Yet</h2>
