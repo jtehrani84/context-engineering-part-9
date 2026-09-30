@@ -72,7 +72,7 @@
       The Harness That<br class="hidden md:block" /> <span class="grad">Improves Itself</span>
     </h1>
     <p class="mt-8 max-w-3xl text-lg md:text-2xl text-slate-300 font-light leading-relaxed">
-      Part 8 left me with a harness that could catch how work goes wrong and a human holding the key to it, and it still couldn't write a single improvement to itself. In Part 7 I said that self-writing part was maybe an October job. It's October now, and Part 9 closes that loop, which is only safe because of one check the loop isn't allowed to grade for itself.
+      Part 8 left me with a harness that could catch how work goes wrong and a human holding the key to it, and it still couldn't write a single improvement to itself. Part 9 closes that loop, which is only safe because of one check the loop isn't allowed to grade for itself.
     </p>
     <div class="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs md:text-sm text-slate-400">
       <span>propose → gate → promote or revert</span><span class="rule">·</span>
@@ -156,7 +156,7 @@
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
       <p>Candidate C is a small version of an old problem. Any metric a system is optimized against stops being a good metric, so point a loop at a score and it'll find the cheapest way to move the number, which is rarely the same as doing the work well. The defense I trust is a set of cases the optimizer can't see or tune against, scored <em>last</em>, where a failure is final... no re-optimizing until the held-out finally says yes, because that's just teaching it the answers slowly.</p>
       <p>NVIDIA's SoL-Pi work builds harness improvements this way and names the sealed, no-feedback held-out as the thing that stops the loop from overfitting itself. Salesforce's own research, SFR-AutoR&amp;D, does the strict version for code, where the improved function has to produce byte-identical output to the original across a big matrix of cases before any speedup counts. Their published results are theirs, on their harnesses and their benchmarks, and I haven't borrowed their percentages, every number on this page is one I measured on my own targets.</p>
-      <p>So a competitor's lab and my own company's researchers both treat the check as the hard part, and after this month I stopped treating it as a detail. Writing a change turned out to be the easy half of this loop, and the hard engineering is in the check that refuses to be fooled by one. That check is where the loop's autonomy comes from, because the proposer can't see it or argue with it, and a smarter proposer wouldn't have bought me any of it.</p>
+      <p>So a competitor's lab and my own company's researchers both treat the check as the hard part, and after building this I stopped treating it as a detail. Writing a change turned out to be the easy half of this loop, and the hard engineering is in the check that refuses to be fooled by one. That check is where the loop's autonomy comes from, because the proposer can't see it or argue with it, and a smarter proposer wouldn't have bought me any of it.</p>
       <p>The loop has also run for real on a governed agent I built for Part 10, where the held-out check caught a genuine gap, I fixed it, re-ran, and it went green. That's one gated improvement, and I'm not claiming compounding. A flywheel where each improvement makes the next one easier is still a hope, and SoL-Pi calls it a future direction too.</p>
     </div>
   </section>
@@ -191,7 +191,7 @@
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
       <p>The thing the loop proposes doesn't have to be an instruction, it can be a cheaper model. Most tasks don't need a frontier brain... mapping some fields, reformatting, a routine bit of code. So the loop can propose running a route on a smaller, cheaper model, and that proposal goes through the same sealed held-out eval as any other change. It keeps the cheaper model only if it clears a bar it can't see, and it falls back to the bigger one if it doesn't.</p>
       <p>There's a second reason to reach for a different model, and it has nothing to do with cost. When the thing being checked is my own work, the worst judge is another copy of me, because it shares my blind spots, so the check that decides what's kept runs on a different lab's model than the one that proposed the change. I measured this earlier in the series, a same-model judge graded its own house style about twelve points too kind, and the different-vendor judge didn't.</p>
-      <p class="text-slate-400 text-base">Both of these are wired and tested, and neither runs on its own yet. A cheaper model stays a candidate until an eval promotes it, and today nothing's been promoted, so what I could do next was point the cross-vendor half at actual work and watch what it did.</p>
+      <p class="text-slate-400 text-base">Both of these are wired and tested, and neither runs on its own yet. A cheaper model stays a candidate until an eval promotes it, and nothing had been promoted yet when I wrote this, so what I could do next was point the cross-vendor half at actual work and watch what it did.</p>
     </div>
   </section>
 
