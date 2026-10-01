@@ -77,7 +77,7 @@
     <div class="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs md:text-sm text-slate-400">
       <span>propose → gate → promote or revert</span><span class="rule">·</span>
       <span>a held-out that never feeds back</span><span class="rule">·</span>
-      <span>autonomy on a leash</span>
+      <span>a custody line the loop can't cross</span>
     </div>
   </div>
 </header>
@@ -191,7 +191,7 @@
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
       <p>The thing the loop proposes doesn't have to be an instruction, it can be a cheaper model. Most tasks don't need a frontier brain... mapping some fields, reformatting, a routine bit of code. So the loop can propose running a route on a smaller, cheaper model, and that proposal goes through the same sealed held-out eval as any other change. It keeps the cheaper model only if it clears a bar it can't see, and it falls back to the bigger one if it doesn't.</p>
       <p>There's a second reason to reach for a different model, and it has nothing to do with cost. When the thing being checked is my own work, the worst judge is another copy of me, because it shares my blind spots, so the check that decides what's kept runs on a different lab's model than the one that proposed the change. I measured this earlier in the series, a same-model judge graded its own house style about twelve points too kind, and the different-vendor judge didn't.</p>
-      <p class="text-slate-400 text-base">Both of these are wired and tested, and neither runs on its own yet. A cheaper model stays a candidate until an eval promotes it, and nothing had been promoted yet when I wrote this, so what I could do next was point the cross-vendor half at actual work and watch what it did.</p>
+      <p class="text-slate-400 text-base">Both of these were wired and tested, and neither ran on its own. A cheaper model stays a candidate until an eval promotes it, and nothing had been promoted yet when I wrote this, so what I could do next was point the cross-vendor half at actual work and watch what it did.</p>
     </div>
   </section>
 
@@ -238,7 +238,7 @@
           <tr class="border-t border-white/5"><td class="py-3 pr-4">A refill rate of zero times an infinite time gap turns the token count into NaN</td><td class="py-3 pr-4 text-slate-400">both labs</td><td class="py-3 text-emerald">real · failing test</td></tr>
           <tr class="border-t border-white/5"><td class="py-3 pr-4">A NaN clock reading slips straight past the time guard</td><td class="py-3 pr-4 text-slate-400">Gemini</td><td class="py-3 text-emerald">real · failing test</td></tr>
           <tr class="border-t border-white/5"><td class="py-3 pr-4">Very small refills round away and are lost for good (two findings, one root cause)</td><td class="py-3 pr-4 text-slate-400">OpenAI</td><td class="py-3 text-emerald">real · failing test</td></tr>
-          <tr class="border-t border-white/5"><td class="py-3 pr-4">A capacity too large to count down one token at a time</td><td class="py-3 pr-4 text-slate-400">OpenAI</td><td class="py-3 text-emerald">real · now rejected</td></tr>
+          <tr class="border-t border-white/5"><td class="py-3 pr-4">A capacity too large to count down one token at a time</td><td class="py-3 pr-4 text-slate-400">OpenAI</td><td class="py-3 text-emerald">real · the fix rejects it</td></tr>
           <tr class="border-t border-white/5"><td class="py-3 pr-4">Add a tolerance so three refills of 0.3 add up to 0.9</td><td class="py-3 pr-4 text-slate-400">Gemini</td><td class="py-3 text-amber">dismissed · it would hand out tokens that don't exist</td></tr>
         </tbody>
       </table>
@@ -253,7 +253,7 @@
   <section class="py-16 md:py-24 reveal">
     <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">Reviewing the Part 10 Page</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
-      <p>Prose doesn't have a test like that, so when the same loop had OpenAI's and Google's models review the Part 10 page and its build spec, every finding got checked first against the source where it would be true. Eight of the 24 merged findings were wrong, like reviewers treating 2026 dates as the future, and the check still caught an error I'd shipped, where the page said the employee agent runs as its own user when it runs as the signed-in user, with that person's permissions and sharing. Grok's spec review only came back after I fixed that budget and the wait. At 8K and 16K tokens it had returned nothing and at 32K it took about two and a half minutes, so now it gets a bigger budget and a longer wait, and an empty answer fails loudly.</p>
+      <p>Prose doesn't have a test like that, so when the same loop had OpenAI's and Google's models review the Part 10 page and its build spec, every finding got checked first against the source where it would be true. Eight of the 24 merged findings were wrong, like reviewers treating 2026 dates as the future, and the check still caught an error I'd shipped, where the page said the employee agent runs as its own user when it runs as the signed-in user, with that person's permissions and sharing. Grok's spec review only came back after I fixed that budget and the wait. At 8K and 16K tokens it had returned nothing and at 32K it took about two and a half minutes, so I gave it a bigger budget and a longer wait, and made an empty answer fail loudly.</p>
       <p>A review like that one is where I trust the loop least, because not every check is as hard to game as a test. Code with a differential test is the good case, since the original function is a perfect oracle, and a judge scoring an agent's answer is the weak case, because a clever loop can learn to please the judge. Where the oracle is soft, the sealed held-out is doing all the work, and I trust the loop exactly as far as I trust that set.</p>
     </div>
   </section>
@@ -263,7 +263,7 @@
     <h2 class="text-2xl md:text-4xl font-bold tracking-tight mb-8">The Hook Nobody Heard</h2>
     <div class="prose-lg max-w-3xl text-slate-300 text-lg">
       <p>And the seal itself is kept by discipline. Nothing physically stops a careless operator from letting held-out results leak back into the proposer, the isolation is enforced by how the loop is wired, and a wiring mistake turns autonomy back into overfitting without anything telling you it happened.</p>
-      <p>I've shipped a silent failure like that myself, in the hooks of the <a href="https://github.com/jtehrani84/claude-code-se-starter-kit" class="text-cyan hover:underline">public starter kit</a> I share with other SEs. They printed a “result” field Claude Code doesn't read, so the guardrail hook detected a force-push to main and let it run anyway, and every warning nudge got dropped the same way. The hooks had looked fine as code, and only a headless run in a scratch repo showed it. Re-running setup upgrades any hook you haven't edited.</p>
+      <p>I've shipped a silent failure like that myself, in the hooks of the <a href="https://github.com/jtehrani84/claude-code-se-starter-kit" class="text-cyan hover:underline">public starter kit</a> I share with other SEs. They printed a “result” field Claude Code doesn't read, so the guardrail hook detected a force-push to main and let it run anyway, and every warning nudge got dropped the same way. The hooks had looked fine as code, and only a headless run in a scratch repo showed it. Re-running setup after that fix upgrades any hook you haven't edited.</p>
       <p>That's one small data point for why Part 10 puts what the harness proved into the platform's own primitives. If the part that lasts is the checks and the custody and the loop, and none of it depends on which model you rent this quarter, where should it live when a check I bolt onto my own scaffold can fail and nobody hears it? Part 10 puts it in the platform itself, and it's the last one, so go <a href="https://jtehrani84.github.io/context-engineering-part-10/">read Part 10 →</a></p>
     </div>
   </section>
